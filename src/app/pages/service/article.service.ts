@@ -1,12 +1,15 @@
+import { Page } from '@/models/page';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { map, Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 interface InventoryStatus {
     label: string;
     value: string;
 }
 
-export interface ArticleModel {
+export class ArticleModel {
     id?: string;
     code?: string;
     name?: string;
@@ -25,8 +28,30 @@ export interface ArticleModel {
     isActif?: any;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ArticleModeleService {
+    protected url:string = environment.hubApiURL;
+
+    constructor(
+		private http: HttpClient
+	) {}
+
+    getAllArticles(params:any) : Observable<Page<ArticleModel>>{
+        return this.http.get<Page<ArticleModel>>(this.url + "/v1/article/getall", {params: params})
+            .pipe(map((result) => {
+                let page : Page<ArticleModel>;
+                page =  Object.setPrototypeOf(result, Page.prototype);
+				page.content.forEach(item => Object.setPrototypeOf(item, ArticleModel.prototype));
+				return page;
+            }
+
+            ));
+    }
+
+    addArticle(article : ArticleModel){
+       return  this.http.post(this.url + "/v1/article/create", article)   ;
+    }
+
     getArticlesData() {
         return [
             {

@@ -78,6 +78,8 @@ export class ArticleComponent implements OnInit {
 
     statuses!: any[];
 
+    errorMessage?: string;
+
     familles!: any[];
 
     categories!: any[];
@@ -244,6 +246,16 @@ export class ArticleComponent implements OnInit {
             default:
                 return 'info';
         }
+    }
+
+    saveArticle(){
+        this.articleService.addArticle(this.article)
+        .subscribe(
+            () => {
+            this.articleDialog = false;
+            this.article = {};
+
+        });
     }
 
     saveProduct() {
