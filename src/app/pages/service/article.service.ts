@@ -1,5 +1,5 @@
 import { Page } from '@/models/page';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -31,6 +31,9 @@ export class ArticleModel {
 @Injectable({ providedIn: 'root' })
 export class ArticleModeleService {
     protected url:string = environment.hubApiURL;
+    httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
 
     constructor(
 		private http: HttpClient
@@ -49,7 +52,7 @@ export class ArticleModeleService {
     }
 
     addArticle(article : ArticleModel){
-       return  this.http.post(this.url + "/v1/article/create", article)   ;
+       return  this.http.post(this.url + "/v1/article/create", article, this.httpOptions)   ;
     }
 
     getArticlesData() {

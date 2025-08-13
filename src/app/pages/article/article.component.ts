@@ -250,12 +250,21 @@ export class ArticleComponent implements OnInit {
 
     saveArticle(){
         this.articleService.addArticle(this.article)
-        .subscribe(
-            () => {
+        .subscribe({
+             next: (response) => {
+        console.log('Article créé avec succès!', response);
+        alert('Article créé!');
+        // Réinitialiser le formulaire
             this.articleDialog = false;
             this.article = {};
-
-        });
+      },
+      error: (err) => {
+        console.error('Erreur lors de la création de l\'article :', err);
+        alert('Erreur: ' + err.message);
+      }   
+        }
+           
+        );
     }
 
     saveProduct() {
