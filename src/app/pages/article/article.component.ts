@@ -22,6 +22,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ArticleModel, ArticleModeleService } from '../service/article.service';
 import { TabsModule } from "primeng/tabs";
 import { Checkbox } from "primeng/checkbox";
+import { FournisseurService } from '@/pages/service/fournisseur.service';
+import { Fournisseur } from '@/models/fournisseur';
 
 interface Column {
     field: string;
@@ -78,9 +80,11 @@ export class ArticleComponent implements OnInit {
 
     statuses!: any[];
 
+    fournisseurList!: Fournisseur[];
+
     errorMessage?: string;
 
-    familles!: any[];
+    type!: any[];
 
     categories!: any[];
 
@@ -94,6 +98,7 @@ export class ArticleComponent implements OnInit {
 
     constructor(
         private articleService: ArticleModeleService,
+        private fournisseurService : FournisseurService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService
     ) {}
@@ -104,6 +109,22 @@ export class ArticleComponent implements OnInit {
 
     ngOnInit() {
         this.loadDemoData();
+        this.getFournisseur();
+    }
+
+
+
+    getFournisseur(){
+       this.fournisseurService.getAllFournisseur().subscribe({
+               next: (response) => {
+                  this.fournisseurList = response;
+                  console.log("FRS===>", this.fournisseurList)
+               },
+               error: (err) => {
+                   console.error('Erreur lors List Fournisseur :', err);
+               }
+           }
+       );
     }
 
     loadDemoData() {
@@ -119,10 +140,10 @@ export class ArticleComponent implements OnInit {
             { label: 'AUTRES', value: 'autres' }
         ];
 
-        this.familles = [
-            { label: 'BOISSON ALCOOLIQUE', value: 'alcoolique' },
-            { label: 'BOISSON HYGIENIQUE', value: 'hygienique' },
-            { label: 'CONDITIONNEMENT', value: 'conditionnement' }
+        this.type = [
+            { label: 'BOISSON ALCOOLIQUE', value: 'BA' },
+            { label: 'BOISSON HYGIENIQUE', value: 'BH' },
+            { label: 'CONDITIONNEMENT', value: 'CD' }
         ];
 
         this.categories = [
@@ -146,7 +167,7 @@ export class ArticleComponent implements OnInit {
             { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
             { field: 'name', header: 'Name' },
             { field: 'image', header: 'Image' },
-            { field: 'price', header: 'Price' },
+            { field: 'prix', header: 'Price' },
             { field: 'category', header: 'Category' }
         ];
 
@@ -192,7 +213,7 @@ export class ArticleComponent implements OnInit {
     }
 
     hideDialog() {
-        this.articleDialog = false;
+        this.pDialog = false;
         this.submitted = false;
     }
 
@@ -249,22 +270,25 @@ export class ArticleComponent implements OnInit {
     }
 
     saveArticle(){
-        this.articleService.addArticle(this.article)
-        .subscribe({
-             next: (response) => {
-        console.log('Article créé avec succès!', response);
-        alert('Article créé!');
-        // Réinitialiser le formulaire
-            this.articleDialog = false;
-            this.article = {};
-      },
-      error: (err) => {
-        console.error('Erreur lors de la création de l\'article :', err);
-        alert('Erreur: ' + err.message);
-      }   
+        this.submitted = true;
+        console.log("this.article==+>" , this.article)
+        if(this.article.name?.trim() && this.article.code?.trim()){
+            this.articleService.addArticle(this.article)
+                .subscribe({
+                        next: (response) => {
+                            console.log('Article créé avec succès!', response);
+                            // Réinitialiser le formulaire
+                            this.pDialog = false;
+                            this.article = {};
+                        },
+                        error: (err) => {
+                            console.error('Erreur lors de la création de l\'article :', err);
+                            alert('Erreur: ' + err.message);
+                        }
+                    }
+                );
         }
-           
-        );
+
     }
 
     saveProduct() {

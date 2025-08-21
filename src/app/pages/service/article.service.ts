@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { Fournisseur } from '@/models/fournisseur';
 
 interface InventoryStatus {
     label: string;
@@ -14,12 +15,12 @@ export class ArticleModel {
     code?: string;
     name?: string;
     description?: string;
-    price?: number;
+    prix?: number;
     quantity?: number;
     inventoryStatus?: string;
     category?: string;
     rating?: number;
-    fournisseur?: any;
+    fournisseur?: Fournisseur;
     type?: any;
     conditionnement?:any;
     typePrix?: any;
@@ -32,7 +33,9 @@ export class ArticleModel {
 export class ArticleModeleService {
     protected url:string = environment.hubApiURL;
     httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+    })
   };
 
     constructor(
@@ -55,6 +58,10 @@ export class ArticleModeleService {
        return  this.http.post(this.url + "/v1/article/create", article, this.httpOptions)   ;
     }
 
+    getArticle(){
+        return this.http.get(this.url + "/v1/article/getTest", this.httpOptions);
+    }
+
     getArticlesData() {
         return [
             {
@@ -68,7 +75,7 @@ export class ArticleModeleService {
                 quantity: 24,
                 inventoryStatus: 'INSTOCK',
                 rating: 5,
-                fournisseur:'STAR'
+                // fournisseur:'STAR'
             },
             {
                 id: '1001',
@@ -81,7 +88,7 @@ export class ArticleModeleService {
                 quantity: 61,
                 inventoryStatus: 'INSTOCK',
                 rating: 4,
-                fournisseur:'STAR'
+                // fournisseur:'STAR'
             },
             {
                 id: '1002',
@@ -94,7 +101,7 @@ export class ArticleModeleService {
                 quantity: 2,
                 inventoryStatus: 'LOWSTOCK',
                 rating: 3,
-                fournisseur:'STAR'
+                // fournisseur:'STAR'
             },
             {
                 id: '1003',
@@ -107,7 +114,7 @@ export class ArticleModeleService {
                 quantity: 25,
                 inventoryStatus: 'INSTOCK',
                 rating: 5,
-                fournisseur:'STAR'
+                // fournisseur:'STAR'
             },
             {
                 id: '1004',
@@ -428,5 +435,5 @@ export class ArticleModeleService {
         return Promise.resolve(this.getArticlesData());
     }
 
-   
+
 }

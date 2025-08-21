@@ -1,8 +1,9 @@
 <p-toolbar styleClass="mb-6">
             <ng-template #start>
-                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
-                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedArticles || !selectedArticles.length" />
+<!--                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />-->
                 <p-button label="Créer" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNewDialog()" />
+                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedArticles || !selectedArticles.length" />
+<!--                <p-button label="Créer" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNewDialog()" />-->
             </ng-template>
 
             <ng-template #end>
@@ -45,9 +46,9 @@
                         <p-sortIcon field="name" />
                     </th>
                     <!-- <th>Image</th> -->
-                    <th pSortableColumn="price" style="min-width: 8rem">
+                    <th pSortableColumn="prix" style="min-width: 8rem">
                         Prix
-                        <p-sortIcon field="price" />
+                        <p-sortIcon field="prix" />
                     </th>
                     <th pSortableColumn="category" style="min-width:10rem">
                         Categorie
@@ -78,7 +79,7 @@
                     <!-- <td>
                         <img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + article.image" [alt]="article.name" style="width: 64px" class="rounded" />
                     </td> -->
-                    <td>{{ article.price }}</td>
+                    <td>{{ article.prix }}</td>
                     <td>{{ article.category }}</td>
                     <td>
                         <p-rating [(ngModel)]="article.rating" [readonly]="true" />
@@ -97,76 +98,13 @@
             </ng-template>
         </p-table>
 
-        <p-dialog [(visible)]="articleDialog" [style]="{ width: '450px' }" header="Créer Article" [modal]="true">
-            <ng-template #content>
-                <div class="flex flex-col gap-6">
-                    <!-- <img [src]="'https://primefaces.org/cdn/primeng/images/demo/article/' + article.image" [alt]="article.image" class="block m-auto pb-4" *ngIf="article.image" /> -->
-                    <div>
-                        <label for="code" class="block font-bold mb-3">Code</label>
-                        <input type="text" pInputText id="code" [(ngModel)]="article.code" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !article.code">Code is required.</small>
-                    </div>
-                    <div>
-                        <label for="name" class="block font-bold mb-3">Name</label>
-                        <input type="text" pInputText id="name" [(ngModel)]="article.name" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !article.name">Name is required.</small>
-                    </div>
-                    <!-- <div>
-                        <label for="description" class="block font-bold mb-3">Description</label>
-                        <textarea id="description" pTextarea [(ngModel)]="article.description" required rows="3" cols="20" fluid></textarea>
-                    </div> -->
 
-                    <div>
-                        <label for="inventoryStatus" class="block font-bold mb-3">Fournisseur</label>
-                        <p-select [(ngModel)]="article.inventoryStatus" inputId="inventoryStatus" [options]="statuses" optionLabel="label" optionValue="label" placeholder="Select a Status" fluid />
-                    </div>
-
-                    <div>
-                        <span class="block font-bold mb-4">Category</span>
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category1" name="category" value="Accessories" [(ngModel)]="article.category" />
-                                <label for="category1">Accessories</label>
-                            </div>
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category2" name="category" value="Clothing" [(ngModel)]="article.category" />
-                                <label for="category2">Clothing</label>
-                            </div>
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category3" name="category" value="Electronics" [(ngModel)]="article.category" />
-                                <label for="category3">Electronics</label>
-                            </div>
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category4" name="category" value="Fitness" [(ngModel)]="article.category" />
-                                <label for="category4">Fitness</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-12 gap-4">
-                        <div class="col-span-6">
-                            <label for="price" class="block font-bold mb-3">Price</label>
-                            <p-inputnumber id="price" [(ngModel)]="article.price"  locale="en-US" fluid />
-                        </div>
-                        <div class="col-span-6">
-                            <label for="quantity" class="block font-bold mb-3">Quantity</label>
-                            <p-inputnumber id="quantity" [(ngModel)]="article.quantity" fluid />
-                        </div>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveProduct()" />
-            </ng-template>
-        </p-dialog>
 
         <p-dialog [(visible)]="pDialog" [style]="{ width: '700px', height: '600px' }" header="Créer Produit" [modal]="true" [resizable]="false">
             <ng-template #content>
                 <!-- <div class="flex flex-col gap-6"> -->
                 <div class="flex flex-col gap-6">
-                    
+
                         <p-tabs value="0" class="my-fixed-tabs">
                             <p-tablist>
                                 <p-tab value="0">Description</p-tab>
@@ -179,7 +117,10 @@
                                         <label for="code" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Code</label>
                                         <div class="col-span-12 md:col-span-10">
                                             <input type="text" pInputText id="code" [(ngModel)]="article.code" required autofocus fluid />
-                                            <small class="text-red-500" *ngIf="submitted && !article.code">Code is required.</small>
+                                            @if (submitted && !article.code){
+                                                <small class="text-red-500">Code is required.</small>
+                                            }
+<!--                                            <small class="text-red-500" *ngIf="submitted && !article.code">Code is required.</small>-->
                                         </div>
                                     </div>
                                     <br>
@@ -187,37 +128,40 @@
                                         <label for="name" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Name</label>
                                         <div class="col-span-12 md:col-span-10">
                                             <input type="text" pInputText id="name" [(ngModel)]="article.name" required autofocus fluid />
-                                            <small class="text-red-500" *ngIf="submitted && !article.name">Name is required.</small>
+                                            @if (submitted && !article.name){
+                                                <small class="text-red-500">Name is required.</small>
+                                            }
+<!--                                            <small class="text-red-500" *ngIf="submitted && !article.name">Name is required.</small>-->
                                         </div>
                                     </div>
                                     <br>
                                     <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-2">
                                         <label for="fournisseur" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Fournisseur</label>
                                         <div class="col-span-12 md:col-span-10">
-                                            <p-select [(ngModel)]="article.fournisseur" inputId="fournisseur" [options]="statuses" optionLabel="label" optionValue="label" placeholder="Selectionner un fournisseur" fluid />
+                                            <p-select [(ngModel)]="article.fournisseur" inputId="fournisseur" [options]="fournisseurList" optionLabel="name"  placeholder="Selectionner un fournisseur" fluid />
                                         </div>
                                     </div>
                                     <br>
                                     <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-2">
                                         <label for="famille" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Famille</label>
                                         <div class="col-span-12 md:col-span-10">
-                                            <p-select [(ngModel)]="article.famille" inputId="famille" [options]="familles" optionLabel="label" optionValue="label" placeholder="Selectionner une famille" fluid />
+                                            <p-select [(ngModel)]="article.famille" inputId="famille" [options]="type" optionLabel="label" placeholder="Selectionner une famille" fluid />
                                         </div>
                                     </div>
                                      <br>
                                     <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-2">
-                                        <label for="famille" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Catégorie</label>
+                                        <label for="categorie" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Catégorie</label>
                                         <div class="col-span-12 md:col-span-10">
                                             <p-select [(ngModel)]="article.category" inputId="categorie" [options]="categories" optionLabel="label" optionValue="label" placeholder="Selectionner un catégorie" fluid />
                                         </div>
-                                    </div>  
+                                    </div>
                                      <br>
                                     <div class="grid grid-cols-12 gap-4">
                                         <div class="flex items-center gap-2 col-span-6">
                                             <p-checkBox id="actif" name="category" value="Actif" [(ngModel)]="article.isActif" />
                                             <label for="category1">Actif</label>
-                                        </div>  
-                                    </div>    
+                                        </div>
+                                    </div>
 
                                 </p-tabpanel>
                                 <p-tabpanel value="1">
@@ -241,16 +185,16 @@
                                 <p-tabpanel value="2">
                                     <div class="grid grid-cols-12 gap-4">
                                         <div class="col-span-6">
-                                            <label for="price" class="block font-bold mb-3">Prix d'achat</label>
-                                            <p-inputnumber id="price" [(ngModel)]="article.price"  fluid />
+                                            <label for="prix" class="block font-bold mb-3">Prix d'achat</label>
+                                            <p-inputnumber id="prix" [(ngModel)]="article.prix"  fluid />
                                         </div>
                                         <div class="col-span-6">
                                             <label for="quantity" class="block font-bold mb-3">Gros</label>
                                             <p-inputnumber id="quantity" [(ngModel)]="article.quantity" fluid />
                                         </div>
                                         <div class="col-span-6">
-                                            <label for="price" class="block font-bold mb-3">Detail</label>
-                                            <p-inputnumber id="price" [(ngModel)]="article.price"  fluid />
+                                            <label for="prix" class="block font-bold mb-3">Detail</label>
+                                            <p-inputnumber id="prix" [(ngModel)]="article.prix"  fluid />
                                         </div>
                                         <div class="col-span-6">
                                             <label for="quantity" class="block font-bold mb-3">Prix Star</label>
@@ -260,25 +204,7 @@
                                 </p-tabpanel>
                             </p-tabpanels>
                         </p-tabs>
-                    
-                    <!-- <img [src]="'https://primefaces.org/cdn/primeng/images/demo/article/' + article.image" [alt]="article.image" class="block m-auto pb-4" *ngIf="article.image" /> -->
-                    
-                    
-                    <!-- <div>
-                        <label for="description" class="block font-bold mb-3">Description</label>
-                        <textarea id="description" pTextarea [(ngModel)]="article.description" required rows="3" cols="20" fluid></textarea>
-                    </div> -->
 
-                    <!-- <div class="grid grid-cols-12 gap-4">
-                        <div class="col-span-6">
-                            <label for="price" class="block font-bold mb-3">Price</label>
-                            <p-inputnumber id="price" [(ngModel)]="article.price"  locale="en-US" fluid />
-                        </div>
-                        <div class="col-span-6">
-                            <label for="quantity" class="block font-bold mb-3">Quantity</label>
-                            <p-inputnumber id="quantity" [(ngModel)]="article.quantity" fluid />
-                        </div>
-                    </div> -->
                 </div>
             </ng-template>
 
