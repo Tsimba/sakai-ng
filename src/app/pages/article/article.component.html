@@ -13,7 +13,7 @@
 
         <p-table
             #dt
-            [value]="articles()"
+            [value]="listArticles()"
             [rows]="10"
             [columns]="cols"
             [paginator]="true"
@@ -47,7 +47,7 @@
                     </th>
                     <!-- <th>Image</th> -->
                     <th pSortableColumn="prix" style="min-width: 8rem">
-                        Prix
+                        Prix de Gros
                         <p-sortIcon field="prix" />
                     </th>
                     <th pSortableColumn="category" style="min-width:10rem">
@@ -79,16 +79,22 @@
                     <!-- <td>
                         <img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + article.image" [alt]="article.name" style="width: 64px" class="rounded" />
                     </td> -->
-                    <td>{{ article.prix }}</td>
-                    <td>{{ article.category }}</td>
+                    <td>
+                        @if(article.prixList[1] !== undefined){
+                            {{ article.prixList[1].valeur }}
+                        } @else {
+                            0.0
+                        }
+                    </td>
+                    <td>{{ article.type.message }}</td>
                     <td>
                         <p-rating [(ngModel)]="article.rating" [readonly]="true" />
                     </td>
                     <td>
-                        <p-tag [value]="article.inventoryStatus" [severity]="getSeverity(article.inventoryStatus)" />
+                        <p-tag [value]="getSeverity(article.isActif)" [severity]="getSeverity(article.isActif)" />
                     </td>
                     <td>
-                        {{ article.fournisseur }}
+                        {{ article.fournisseur.code }}
                     </td>
                     <td>
                         <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editProduct(article)" />
@@ -120,7 +126,6 @@
                                             @if (submitted && !article.code){
                                                 <small class="text-red-500">Code is required.</small>
                                             }
-<!--                                            <small class="text-red-500" *ngIf="submitted && !article.code">Code is required.</small>-->
                                         </div>
                                     </div>
                                     <br>
@@ -143,63 +148,59 @@
                                     </div>
                                     <br>
                                     <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-2">
-                                        <label for="famille" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Famille</label>
+                                        <label for="type" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Famille</label>
                                         <div class="col-span-12 md:col-span-10">
-                                            <p-select [(ngModel)]="article.famille" inputId="famille" [options]="type" optionLabel="label" placeholder="Selectionner une famille" fluid />
+                                            <p-select [(ngModel)]="article.type" inputId="type" [options]="type" optionLabel="message"  placeholder="Selectionner une famille" fluid />
                                         </div>
                                     </div>
                                      <br>
                                     <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-2">
                                         <label for="categorie" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Catégorie</label>
                                         <div class="col-span-12 md:col-span-10">
-                                            <p-select [(ngModel)]="article.category" inputId="categorie" [options]="categories" optionLabel="label" optionValue="label" placeholder="Selectionner un catégorie" fluid />
+                                            <p-select [(ngModel)]="article.conditionnement" inputId="categorie" [options]="categories" optionLabel="label" optionValue="label" placeholder="Selectionner un catégorie" fluid />
                                         </div>
                                     </div>
                                      <br>
                                     <div class="grid grid-cols-12 gap-4">
                                         <div class="flex items-center gap-2 col-span-6">
-                                            <p-checkBox id="actif" name="category" value="Actif" [(ngModel)]="article.isActif" />
+                                            <p-checkBox id="actif" name="category" binary="true" [(ngModel)]="article.isActif" />
                                             <label for="category1">Actif</label>
                                         </div>
                                     </div>
 
                                 </p-tabpanel>
                                 <p-tabpanel value="1">
-                                    <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-2">
-                                        <label for="bouteille" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Bouteille</label>
-                                        <div class="col-span-12 md:col-span-10">
-                                            <input pInputText id="bouteillecageot" type="text" />
+                                     <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-3">
+                                        <label for="emballage" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Emballage</label>
+                                        <div class="col-span-12 md:col-span-4">
+                                            <p-select [(ngModel)]="conditionnement.articleBtl" inputId="emballage" [options]="listBottle" optionLabel="name" optionValue="id" placeholder="Selectionner le bouteille" fluid />
+                                        </div>
+                                        <div class="col-span-12 md:col-span-4">
+                                            <p-select [(ngModel)]="conditionnement.articleCgt"  [options]="listCageot" optionLabel="name" optionValue="id" placeholder="Selectionner le cageot" fluid />
                                         </div>
                                     </div>
                                     <br>
-                                    <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-3">
-                                        <label for="cageot" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Cageot</label>
-                                        <div class="col-span-12 md:col-span-4">
-                                            <p-select [(ngModel)]="article.cageot" inputId="cageot" [options]="cageots" optionLabel="label" optionValue="label" placeholder="Selectionner un cageot" fluid />
+
+                                    <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-2">
+                                        <label for="bouteille" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Nbre de bouteille / Cgt</label>
+                                        <div class="col-span-12 md:col-span-10">
+                                            <p-inputnumber id="bouteille" [(ngModel)]="conditionnement.nbreBtl" fluid />
                                         </div>
-                                        <div class="col-span-12 md:col-span-4">
-                                            <input pInputText id="cageot" type="text" />
-                                        </div>
+
                                     </div>
+                                    <br>
+
                                 </p-tabpanel>
                                 <p-tabpanel value="2">
-                                    <div class="grid grid-cols-12 gap-4">
-                                        <div class="col-span-6">
-                                            <label for="prix" class="block font-bold mb-3">Prix d'achat</label>
-                                            <p-inputnumber id="prix" [(ngModel)]="article.prix"  fluid />
-                                        </div>
-                                        <div class="col-span-6">
-                                            <label for="quantity" class="block font-bold mb-3">Gros</label>
-                                            <p-inputnumber id="quantity" [(ngModel)]="article.quantity" fluid />
-                                        </div>
-                                        <div class="col-span-6">
-                                            <label for="prix" class="block font-bold mb-3">Detail</label>
-                                            <p-inputnumber id="prix" [(ngModel)]="article.prix"  fluid />
-                                        </div>
-                                        <div class="col-span-6">
-                                            <label for="quantity" class="block font-bold mb-3">Prix Star</label>
-                                            <p-inputnumber id="quantity" [(ngModel)]="article.quantity" fluid />
-                                        </div>
+                                    <div class="grid grid-cols-12 gap-4 grid-cols-12 gap-2">
+                                        @for(prixType of prixtypeList; track prixType.id; let i = $index){
+                                            <label for="prixType.code" class="flex font-bold items-center col-span-12 mb-2 md:col-span-2 md:mb-0">{{prixType.libelle}}</label>
+                                            <div class="col-span-12 md:col-span-10">
+                                                <p-inputnumber id="listPrix[i]" [(ngModel)]="listPrix[i].valeur"   fluid />
+    <!--                                            <small class="text-red-500" *ngIf="submitted && !article.code">Code is required.</small>-->
+                                            </div>
+                                        }
+
                                     </div>
                                 </p-tabpanel>
                             </p-tabpanels>

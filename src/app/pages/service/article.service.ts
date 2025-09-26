@@ -1,9 +1,12 @@
 import { Page } from '@/models/page';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Fournisseur } from '@/models/fournisseur';
+import { Conditionnement } from '@/models/conditionnement';
+import { Prix } from '@/models/prix';
+import { PrixType } from '@/models/prixtype';
 
 interface InventoryStatus {
     label: string;
@@ -15,7 +18,6 @@ export class ArticleModel {
     code?: string;
     name?: string;
     description?: string;
-    prix?: number;
     quantity?: number;
     inventoryStatus?: string;
     category?: string;
@@ -24,10 +26,13 @@ export class ArticleModel {
     type?: any;
     conditionnement?:any;
     typePrix?: any;
-    famille?: any;
     cageot?: any;
-    isActif?: any;
+    isActif?: boolean;
+    emballage?: string;
+    condition?: Conditionnement;
+    prixList?: Prix[] ;
 }
+
 
 @Injectable({ providedIn: 'root' })
 export class ArticleModeleService {
@@ -54,12 +59,31 @@ export class ArticleModeleService {
             ));
     }
 
+    getAllListArticles():Observable<any>{
+        return this.http.get(this.url + "/v1/article/getall");
+    }
+
     addArticle(article : ArticleModel){
        return  this.http.post(this.url + "/v1/article/create", article, this.httpOptions)   ;
     }
 
-    getArticle(){
-        return this.http.get(this.url + "/v1/article/getTest", this.httpOptions);
+    getArticleByCategory(category:any): Observable<any>{
+         const params = new HttpParams().set("category", category);
+        return this.http.get(this.url + "/v1/article/get/category",{params});
+
+    }
+
+    getArticleByCategoryAndType(category:any, type:any): Observable<any>{
+         const params = new HttpParams()
+                            .set("category", category)
+                            .set("type", type);
+         console.log("params===>", params);
+        return this.http.get(this.url + "/v1/article/get/category/type",{params});
+
+    }
+
+    getPrixTypeList():Observable<PrixType[]>{
+         return this.http.get<PrixType[]>(this.url + "/v1/prixtype/getall");
     }
 
     getArticlesData() {

@@ -24,6 +24,9 @@ import { TabsModule } from "primeng/tabs";
 import { Checkbox } from "primeng/checkbox";
 import { FournisseurService } from '@/pages/service/fournisseur.service';
 import { Fournisseur } from '@/models/fournisseur';
+import { Conditionnement } from '@/models/conditionnement';
+import { PrixType } from '@/models/prixtype';
+import { Prix } from '@/models/prix';
 
 interface Column {
     field: string;
@@ -80,7 +83,19 @@ export class ArticleComponent implements OnInit {
 
     statuses!: any[];
 
+    familles!: any[];
+
     fournisseurList!: Fournisseur[];
+
+    articleList!: ArticleModel[];
+
+    listArticles = signal<ArticleModel[]>([]);
+
+    listBottle!:ArticleModel[];
+    listCageot!:ArticleModel[];
+
+    emballage!: string;
+    cageot!:string;
 
     errorMessage?: string;
 
@@ -90,7 +105,19 @@ export class ArticleComponent implements OnInit {
 
     cageots!: any[];
 
+    articleTmp!: ArticleModel;
+
+    prixtypeList!: PrixType[];
+
+    prixtype: PrixType[] = [];
+
+    listPrix: Prix[] = [];
+
+    conditionnement: Conditionnement = new Conditionnement();
+
     @ViewChild('dt') dt!: Table;
+
+    // index: number = 0;
 
     exportColumns!: ExportColumn[];
 
@@ -108,30 +135,16 @@ export class ArticleComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.loadDemoData();
+        this.getAllListArticles();
         this.getFournisseur();
-    }
-
-
-
-    getFournisseur(){
-       this.fournisseurService.getAllFournisseur().subscribe({
-               next: (response) => {
-                  this.fournisseurList = response;
-                  console.log("FRS===>", this.fournisseurList)
-               },
-               error: (err) => {
-                   console.error('Erreur lors List Fournisseur :', err);
-               }
-           }
-       );
+        this.getBoouteillesList();
+        this.getCageotList();
+        this.getArticleByCategory();
+        this.loadDemoData();
+         this.getPrixTypeList();
     }
 
     loadDemoData() {
-        this.articleService.getArticles().then((data) => {
-            this.articles.set(data);
-        });
-
         this.statuses = [
             { label: 'STAR', value: 'star' },
             { label: 'SODEAM', value: 'sodeam' },
@@ -141,9 +154,9 @@ export class ArticleComponent implements OnInit {
         ];
 
         this.type = [
-            { label: 'BOISSON ALCOOLIQUE', value: 'BA' },
-            { label: 'BOISSON HYGIENIQUE', value: 'BH' },
-            { label: 'CONDITIONNEMENT', value: 'CD' }
+            { message: 'BOISSON ALCOOLIQUE', code: 'BA' },
+            { message: 'BOISSON HYGIENIQUE', code: 'BH' },
+            { message: 'CONDITIONNEMENT', code: 'CD' }
         ];
 
         this.categories = [
@@ -167,11 +180,96 @@ export class ArticleComponent implements OnInit {
             { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
             { field: 'name', header: 'Name' },
             { field: 'image', header: 'Image' },
-            { field: 'prix', header: 'Price' },
+            { field: 'price', header: 'Price' },
             { field: 'category', header: 'Category' }
         ];
 
         this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
+    }
+
+
+    getAllListArticles(){
+        this.articleService.getAllListArticles().subscribe({
+            next:(response) => {
+                console.log("responseARticle=>", response)
+                this.listArticles.set(response)
+                console.log("Listes All Articles===>", this.listArticles)
+            }
+        });
+    }
+
+    getPrixTypeList(){
+        this.articleService.getPrixTypeList().subscribe({
+             next: (response) => {
+                  this.prixtypeList = response;
+                  this.createNewPrixList(this.prixtypeList);
+               },
+               error: (err) => {
+                   console.error('Erreur lors List PrixType :', err);
+               }
+        });
+    }
+
+    createNewPrixList(listPrixType : PrixType[]){
+        for(let prixtype of listPrixType){
+             let prix = new Prix();
+             prix.type = prixtype;
+             this.listPrix.push(prix);
+        }
+    }
+
+
+
+    getFournisseur(){
+       this.fournisseurService.getAllFournisseur().subscribe({
+               next: (response) => {
+                  this.fournisseurList = response;
+               },
+               error: (err) => {
+                   console.error('Erreur lors List Fournisseur :', err);
+               }
+           }
+       );
+    }
+
+    getArticleByCategory(){
+        this.articleService.getArticleByCategory("Emballages").subscribe(
+            {
+            next: (data) => {
+                this.articleList = data;
+                console.log("Articles reçus :", data);
+            },
+            error: (err) => {
+                console.error("Erreur lors de l'appel API :", err);
+            }
+            }
+        );
+    }
+
+    getBoouteillesList(){
+        this.articleService.getArticleByCategoryAndType("Emballages", "CD").subscribe(
+            {
+            next: (data) => {
+                this.listBottle = data;
+            },
+            error: (err) => {
+                console.error("Erreur lors de l'appel API :", err);
+            }
+            }
+        );
+    }
+
+    getCageotList(){
+        this.articleService.getArticleByCategoryAndType("Conditionnements", "CD").subscribe(
+            {
+            next: (data) => {
+                this.listCageot = data;
+            },
+            error: (err) => {
+                console.error("Erreur lors de l'appel API :", err);
+            }
+            }
+        );
     }
 
     onGlobalFilter(table: Table, event: Event) {
@@ -185,13 +283,67 @@ export class ArticleComponent implements OnInit {
     }
     openNewDialog() {
         this.article = {};
+        this.conditionnement.articleBtl = null;
+        this.conditionnement.articleCgt = null;
+        this.conditionnement.nbreBtl = 0;
         this.submitted = false;
         this.pDialog = true;
     }
 
+    onPrixChange(valeur: number, i: number) {
+        if (!this.listPrix[i]) {
+            this.listPrix[i] = { valeur: 0 }; // tu peux mettre d'autres champs si besoin
+        }
+        this.listPrix[i].valeur = valeur;
+    }
+
     editProduct(product: ArticleModel) {
+        this.conditionnement.articleBtl = null;
+        this.conditionnement.articleCgt = null;
+        this.conditionnement.nbreBtl = 0;
         this.article = { ...product };
-        this.articleDialog = true;
+        this.pDialog = true;
+        if(this.article.condition != undefined || this.article.condition != null){
+            this.conditionnement = this.article.condition;
+        }
+        console.log("EDIT ARTICLE====>", this.article);
+
+        if(this.article.prixList != undefined || this.article.prixList != null ){
+            if(this.article.prixList.length != 0){
+                for(let prix of  this.article.prixList){
+                    if(this.listPrix === undefined ||  this.listPrix === null){
+                        this.listPrix = [];
+                        this.listPrix.push(prix);
+                    } else {
+                        console.log("MIS VALL")
+                        const price = this.listPrix.find(p => p.type?.code === prix.type?.code);
+                        if(price){
+                            price.id = prix.id;
+                            price.valeur = prix.valeur;
+                        }
+                    }
+
+
+                }
+            } else {
+                console.log("this.article.prixList====>", this.article.prixList);
+                console.log("this.listPrix====>", this.listPrix);
+                for(let prix of this.listPrix){
+                    prix.valeur = 0;
+                    prix.id = undefined;
+                    // prix.article = new ArticleModel();
+                }
+            }
+
+            console.log("LIST PRIX====>", this.listPrix);
+
+        } else {
+            console.log("prixList===>", this.article.prixList)
+            this.listPrix = [];
+            // this.listPrix =
+
+        }
+
     }
 
     deleteSelectedProducts() {
@@ -256,27 +408,34 @@ export class ArticleComponent implements OnInit {
         return id;
     }
 
-    getSeverity(status: string) {
+    getSeverity(status: boolean) {
         switch (status) {
-            case 'INSTOCK':
-                return 'success';
-            case 'LOWSTOCK':
-                return 'warn';
-            case 'OUTOFSTOCK':
-                return 'danger';
+            case true:
+                return 'ACTIF';
             default:
-                return 'info';
+                return 'INACTIF';
         }
     }
 
     saveArticle(){
         this.submitted = true;
+        if(this.conditionnement !== null){
+            this.article.condition = this.conditionnement;
+        }
+        this.article.prixList = this.listPrix;
         console.log("this.article==+>" , this.article)
         if(this.article.name?.trim() && this.article.code?.trim()){
             this.articleService.addArticle(this.article)
                 .subscribe({
                         next: (response) => {
                             console.log('Article créé avec succès!', response);
+                            this.articleTmp = response;
+                            if(this.articleTmp.conditionnement === 'Conditionnements'){
+                                this.getCageotList();
+                            } else if(this.articleTmp.conditionnement === 'Emballages'){
+                                this.getBoouteillesList()        ;
+                            }
+                            this.getAllListArticles();
                             // Réinitialiser le formulaire
                             this.pDialog = false;
                             this.article = {};
