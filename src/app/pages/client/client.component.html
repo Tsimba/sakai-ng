@@ -1,0 +1,127 @@
+<p-toolbar styleClass="mb-6">
+            <ng-template #start>
+                <p-button label="Créer" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNewDialog()" />
+                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedClient || !selectedClient.length" />
+            </ng-template>
+
+            <ng-template #end>
+                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+            </ng-template>
+        </p-toolbar>
+
+        <p-table
+            #dt
+            [value]="listClients()"
+            [rows]="10"
+            [columns]="cols"
+            [paginator]="true"
+            [globalFilterFields]="['firstName', 'lastname', 'email', 'addresse']"
+            [tableStyle]="{ 'min-width': '75rem' }"
+            [(selection)]="selectedClient"
+            [rowHover]="true"
+            dataKey="id"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} articles"
+            [showCurrentPageReport]="true"
+            [rowsPerPageOptions]="[10, 20, 30]"
+        >
+            <ng-template #caption>
+                <div class="flex items-center justify-between">
+                    <h5 class="m-0">Liste des clients</h5>
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+            <ng-template #header>
+                <tr>
+                    <th style="width: 3rem">
+                        <p-tableHeaderCheckbox />
+                    </th>
+                    <th style="min-width: 16rem">ID</th>
+                    <th pSortableColumn="firstName" style="min-width:16rem">
+                        Nom
+                        <p-sortIcon field="firstName" />
+                    </th>
+                    <!-- <th>Image</th> -->
+                    <th pSortableColumn="lastname" style="min-width: 8rem">
+                        Prénom
+                        <p-sortIcon field="lastname" />
+                    </th>
+                    <th pSortableColumn="email" style="min-width:10rem">
+                        Email
+                        <p-sortIcon field="email" />
+                    </th>
+                    <th pSortableColumn="phone" style="min-width:10rem">
+                        Télephone
+                        <p-sortIcon field="phone" />
+                    </th>
+
+                    <th pSortableColumn="addresse" style="min-width: 12rem">
+                        Adresse
+                        <p-sortIcon field="addresse" />
+                    </th>
+                    <th style="min-width: 12rem"></th>
+                </tr>
+            </ng-template>
+            <ng-template #body let-client>
+                <tr>
+                    <td style="width: 3rem">
+                        <p-tableCheckbox [value]="client" />
+                    </td>
+                    <td style="min-width: 12rem">{{ client.id }}</td>
+                    <td style="min-width: 16rem">{{ client.firstName }}</td>
+                    <td style="min-width: 16rem">{{client.lastname }} </td>
+                    <td>{{ client.email }}</td>
+                    <td > {{ client.phone }} </td>
+                    <td>
+                        {{ client.addresse }}
+                    </td>
+                    <td>
+                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editClient(client)" />
+                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteClient(client)" />
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+
+
+        <p-dialog [(visible)]="pDialog" [style]="{ width: '550px' }" header="Créer Client" [modal]="true" [resizable]="false">
+            <ng-template #content>
+
+                <div class="flex flex-col gap-6">
+                    <div>
+                        <label for="firstName" class="block font-bold mb-3">Nom</label>
+                        <input type="text" pInputText id="firstName" [(ngModel)]="client.firstName" required autofocus fluid />
+                        <small class="text-red-500" *ngIf="submitted && !client.firstName">Name is required.</small>
+                    </div>
+                    <div>
+                        <label for="lastname" class="block font-bold mb-3">Prénom</label>
+                        <input type="text" pInputText id="lastname" [(ngModel)]="client.lastname" required autofocus fluid />
+                        <small class="text-red-500" *ngIf="submitted && !client.lastname">Name is required.</small>
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block font-bold mb-3">Télephone</label>
+                        <input type="text" pInputText id="phone" [(ngModel)]="client.phone"  fluid />
+                    </div>
+
+                    <div>
+                        <label for="description" class="block font-bold mb-3">Adresse</label>
+                        <textarea id="description" pTextarea [(ngModel)]="client.addresse"  required rows="3" cols="20" fluid></textarea>
+                    </div>
+
+
+
+                </div>
+
+            </ng-template>
+
+            <ng-template #footer>
+                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+                <p-button label="Save" icon="pi pi-check" (click)="saveClient()" />
+            </ng-template>
+        </p-dialog>
+
+        <p-confirmdialog [style]="{ width: '450px' }" />

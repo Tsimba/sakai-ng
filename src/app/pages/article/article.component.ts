@@ -369,6 +369,29 @@ export class ArticleComponent implements OnInit {
         this.submitted = false;
     }
 
+    deleteArticle(article: ArticleModel) {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to delete ' + article.name + '?',
+            header: 'Confirm',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.articleService.deleteArticle(article).subscribe({
+                    next: () => {
+                        this.getAllListArticles()
+                        this.article = {};
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Product Deleted',
+                            life: 3000
+                        });
+                    }
+
+                });
+            }
+        });
+    }
+
     deleteProduct(article: ArticleModel) {
         this.confirmationService.confirm({
             message: 'Are you sure you want to delete ' + article.name + '?',
@@ -409,6 +432,15 @@ export class ArticleComponent implements OnInit {
     }
 
     getSeverity(status: boolean) {
+        switch (status) {
+            case true:
+                return 'success';
+            default:
+                return 'warn';
+        }
+    }
+
+    getValueStatus(status: boolean){
         switch (status) {
             case true:
                 return 'ACTIF';

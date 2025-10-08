@@ -76,6 +76,11 @@ export class AppMenu {
                         ]
                     },
                     {
+                        label: 'Client',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/pages/client']
+                    },
+                    {
                         label: 'Crud',
                         icon: 'pi pi-fw pi-pencil',
                         routerLink: ['/pages/crud']

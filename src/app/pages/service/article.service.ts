@@ -59,6 +59,11 @@ export class ArticleModeleService {
             ));
     }
 
+    deleteArticle(article: ArticleModel): Observable<any>{
+        console.log("DELETE SERVICE")
+        return  this.http.delete(this.url + "/v1/article/delete/"+ article.id)
+    }
+
     getAllListArticles():Observable<any>{
         return this.http.get(this.url + "/v1/article/getall");
     }
