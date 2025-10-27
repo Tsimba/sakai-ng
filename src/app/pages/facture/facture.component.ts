@@ -13,17 +13,19 @@ import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabsModule } from "primeng/tabs";
-import { Checkbox } from "primeng/checkbox";
 import { ClientService } from '@/pages/service/clients.service';
 import { Client } from '@/models/client';
-import { Message } from 'primeng/message';
 import { FluidModule } from 'primeng/fluid';
+import { ArticleModel } from '@/pages/service/article.service';
+import { FloatLabel } from 'primeng/floatlabel';
+import { DatePicker } from 'primeng/datepicker';
+import { AutoFocus } from 'primeng/autofocus';
+import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 
 interface Column {
     field: string;
@@ -53,35 +55,36 @@ interface ExportColumn {
         SelectModule,
         RadioButtonModule,
         InputNumberModule,
-        DialogModule,
         TagModule,
         InputIconModule,
         IconFieldModule,
         ConfirmDialogModule,
         TabsModule,
         // Message,
-        FluidModule
+        FluidModule,
+        FloatLabel,
+        DatePicker,
+        AutoFocus,
+        AutoComplete
         // Checkbox
     ],
-    templateUrl: './client.component.html',
-    styleUrls: ['./client.component.scss'],
+    templateUrl: './facture.component.html',
+    styleUrls: ['./facture.component.scss'],
 
     providers: [MessageService, ClientService, ConfirmationService]
 })
-export class ClientComponent implements OnInit {
-    pDialog: boolean = false;
-
-    articles = signal<Client[]>([]);
+export class FactureComponent implements OnInit {
+    articles = signal<ArticleModel[]>([]);
 
     client!: Client;
 
-    selectedClient!: Client[] | null;
+    selectedArticle!: ArticleModel[] | null;
 
     submitted: boolean = false;
 
     statuses!: any[];
 
-    listClients = signal<Client[]>([]);
+    listArticles: ArticleModel[] = [];
 
     type!: any[];
 
@@ -92,6 +95,22 @@ export class ClientComponent implements OnInit {
     exportColumns!: ExportColumn[];
 
     cols!: Column[];
+
+    date: Date = new Date();
+
+    private tempIdCounter = 1;
+
+    filteredClients: any | undefined;
+
+    selectedClients: any;
+
+    dropdownItems = [
+        { name: 'Gros', code: 'Option 1' },
+        { name: 'Star', code: 'Option 2' },
+        { name: 'Detail', code: 'Option 3' }
+    ];
+
+    dropdownItem = null;
 
     constructor(
         private clientService: ClientService,
@@ -108,6 +127,22 @@ export class ClientComponent implements OnInit {
         this.loadDemoData();
     }
 
+    addRow() {
+        this.listArticles.push({ id: this.tempIdCounter++, name: '' });
+    }
+
+    searchByName(event: AutoCompleteCompleteEvent) {
+        let query = event.query;
+        this.clientService.searchByName(query).subscribe({
+            next: (data) => {
+                this.filteredClients = data;
+            },
+            error: (err) => {
+                console.error("Erreur lors de l'appel API :", err);
+            }
+        });
+    }
+
     loadDemoData() {
         this.cols = [
             { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
@@ -120,77 +155,20 @@ export class ClientComponent implements OnInit {
         this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
     }
 
-
-    getAllClients() {
-        this.clientService.getAllListClients().subscribe({
-            next: (response) => {
-                console.log('responseARticle=>', response);
-                this.listClients.set(response);
-                console.log('Listes All Articles===>', this.listClients);
-            }
-        });
-    }
+    getAllClients() {}
 
     onGlobalFilter(table: Table, event: Event) {
-        console.log("table====>", table)
+        console.log('table====>', table);
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-    }
-
-    openNewDialog() {
-        this.client = {};
-        this.submitted = false;
-        this.pDialog = true;
     }
 
     editClient(client: Client) {
         this.client = { ...client };
-        this.pDialog = true;
     }
 
-    deleteSelectedProducts() {
-        this.confirmationService.confirm({
-            message: 'Are you sure you want to delete the selected article?',
-            header: 'Confirm',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.articles.set(this.articles().filter((val) => !this.selectedClient?.includes(val)));
-                this.selectedClient = null;
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Article Deleted',
-                    life: 3000
-                });
-            }
-        });
-    }
+    deleteSelectedProducts() {}
 
-    hideDialog() {
-        this.pDialog = false;
-        this.submitted = false;
-    }
-
-    deleteClient(client: Client) {
-        this.confirmationService.confirm({
-            message: 'Are you sure you want to delete ' + client.lastname + '?',
-            header: 'Confirm',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.clientService.deleteClient(client).subscribe({
-                    next: () => {
-                        this.getAllClients();
-                        this.client = {};
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Successful',
-                            detail: 'Client Deleted',
-                            life: 3000
-                        });
-                    }
-                });
-            }
-        });
-    }
+    deleteClient(client: Client) {}
 
     getSeverity(status: boolean) {
         switch (status) {
@@ -210,22 +188,5 @@ export class ClientComponent implements OnInit {
         }
     }
 
-    saveClient() {
-        this.submitted = true;
-
-        if (this.client.firstName?.trim() && this.client.lastname?.trim()) {
-            this.clientService.addClient(this.client).subscribe({
-                next: (response) => {
-                    this.getAllClients();
-                    // Réinitialiser le formulaire
-                    this.pDialog = false;
-                    this.client = {};
-                },
-                error: (err) => {
-                    console.error("Erreur lors de la création de l'article :", err);
-                    alert('Erreur: ' + err.message);
-                }
-            });
-        }
-    }
+    saveClient() {}
 }

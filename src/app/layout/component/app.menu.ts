@@ -76,6 +76,22 @@ export class AppMenu {
                         ]
                     },
                     {
+                        label: 'Facture',
+                        icon: 'pi pi-fw pi-calculator',
+                        items: [
+                            {
+                                label: 'Création',
+                                icon: 'pi pi-fw pi-file',
+                                routerLink: ['/pages/facture']
+                            },
+                            {
+                                label: 'Listes Factures',
+                                icon: 'pi pi-fw pi-list',
+                                routerLink: ['/auth/error']
+                            }
+                        ]
+                    },
+                    {
                         label: 'Client',
                         icon: 'pi pi-fw pi-users',
                         routerLink: ['/pages/client']

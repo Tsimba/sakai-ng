@@ -413,10 +413,10 @@ export class ArticleComponent implements OnInit {
     findIndexById(id: string): number {
         let index = -1;
         for (let i = 0; i < this.articles().length; i++) {
-            if (this.articles()[i].id === id) {
-                index = i;
-                break;
-            }
+            // if (this.articles()[i].id === id) {
+            //     index = i;
+            //     break;
+            // }
         }
 
         return index;
@@ -487,7 +487,7 @@ export class ArticleComponent implements OnInit {
         let _products = this.articles();
         if (this.article.name?.trim()) {
             if (this.article.id) {
-                _products[this.findIndexById(this.article.id)] = this.article;
+                // _products[this.findIndexById(this.article.id)] = this.article;
                 this.articles.set([..._products]);
                 this.messageService.add({
                     severity: 'success',
@@ -496,7 +496,7 @@ export class ArticleComponent implements OnInit {
                     life: 3000
                 });
             } else {
-                this.article.id = this.createId();
+                // this.article.id = this.createId();
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Successful',

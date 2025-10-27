@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Client } from '@/models/client';
 
@@ -30,6 +30,12 @@ export class ClientService {
 
     addClient(client : Client){
         return  this.http.post(this.url + "/v1/client/create", client, this.httpOptions)   ;
+    }
+
+   searchByName(name:any): Observable<any>{
+        const params = new HttpParams().set("name", name);
+        return this.http.get(this.url + "/v1/client/search/name",{params});
+
     }
 
 }

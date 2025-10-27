@@ -1,0 +1,168 @@
+
+    <p-fluid>
+        <div class="flex flex-col md:flex-row gap-8">
+        <div class="md:w-1/2">
+            <div class="card flex flex-col gap-4">
+                <div class="font-semibold text-xl">Facture</div>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <p-floatlabel variant="on">
+                        <input pInputText id="numfact"  placeholder="N°"  [disabled]="true" class="flex-1 w-full" />
+                        <label for="numfact">Fact N°</label>
+                    </p-floatlabel>
+                    <p-floatlabel variant="on">
+                        <p-datepicker [(ngModel)]="date"  id="on_date"   [disabled]="true"  class="flex-1 w-full" />
+                        <label for="on_date">Date</label>
+                    </p-floatlabel>
+                    <p-select id="typeprix" [(ngModel)]="dropdownItem" [options]="dropdownItems"  placeholder="Tarif"   optionLabel="name"  class="flex-1 w-full" ></p-select>
+                </div>
+            </div>
+        </div>
+
+        <div class="md:w-1/2">
+                <div class="card flex flex-col gap-4">
+                    <div class="font-semibold text-xl">Client</div>
+                    <div class="flex flex-col md:flex-row gap-4">
+<!--                        <p-floatlabel variant="on">-->
+<!--                            <input pInputText id="client" class="flex-1 w-full" />-->
+<!--                            <label for="client">Code</label>-->
+<!--                        </p-floatlabel>-->
+<!--                        <p-floatlabel variant="on">-->
+                            <p-autocomplete  id="prenom" [(ngModel)]="selectedClients" class="flex-1 w-full" placeholder="Client" [suggestions]="filteredClients" (completeMethod)="searchByName($event)" optionLabel="lastname" />
+<!--                            <label for="prenom">Nom de Client</label>-->
+<!--                        </p-floatlabel>-->
+<!--                        <p-floatlabel variant="on" class="w-20rem">-->
+<!--                            <p-autocomplete  id="prenom" [(ngModel)]="selectedClients" class="flex-1 w-full" [suggestions]="filteredClients" (completeMethod)="searchByName($event)" optionLabel="lastname" />-->
+<!--                            <label for="prenom">Nom de Client</label>-->
+<!--                        </p-floatlabel>-->
+                    </div>
+
+                </div>
+
+        </div>
+        </div>
+
+<!--        <br>-->
+    </p-fluid>
+<!--<div class="flex items-start gap-3">-->
+        <p-tabs value="0" >
+            <p-tablist>
+                <p-tab value="0">Description</p-tab>
+                <p-tab value="1">Conditionnement</p-tab>
+            </p-tablist>
+            <p-tabpanels>
+                <p-tabpanel value="0">
+                    <p-table
+                        #dt
+                        [scrollable]="true"
+                        scrollHeight="800px"
+                        [value]="listArticles"
+                        [rows]="50"
+                        [columns]="cols"
+                        [size]="'small'"
+                        [globalFilterFields]="['firstName', 'lastname', 'email', 'addresse']"
+                        [tableStyle]="{ 'min-width': '75rem' }"
+                        [(selection)]="selectedArticle"
+                        [rowHover]="true"
+                        dataKey="id"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} articles"
+                        [showCurrentPageReport]="true"
+                        [rowsPerPageOptions]="[10, 20, 30]"
+                    >
+
+                        <ng-template #header>
+                            <tr>
+                                <th style="width: 3rem">
+                                    <p-tableHeaderCheckbox />
+                                </th>
+                                <th style="min-width: 5rem">ID</th>
+                                <th pSortableColumn="firstName" style="min-width:16rem">
+                                    Nom
+                                    <p-sortIcon field="firstName" />
+                                </th>
+                                <!-- <th>Image</th> -->
+                                <th pSortableColumn="lastname" style="min-width: 8rem">
+                                    Prénom
+                                    <p-sortIcon field="lastname" />
+                                </th>
+                                <th pSortableColumn="email" style="min-width:10rem">
+                                    Email
+                                    <p-sortIcon field="email" />
+                                </th>
+                                <th pSortableColumn="phone" style="min-width:10rem">
+                                    Télephone
+                                    <p-sortIcon field="phone" />
+                                </th>
+
+                                <th pSortableColumn="addresse" style="min-width: 12rem">
+                                    Adresse
+                                    <p-sortIcon field="addresse" />
+                                </th>
+                                <th style="min-width: 12rem"></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #caption>
+                            <div class="flex justify-between items-center">
+                                <!--                                <h3 class="text-lg font-semibold">Liste des clients</h3>-->
+
+                                <div class="flex gap-2">
+                                    <p-button label="Créer" icon="pi pi-plus" class="mr-2" (onClick)="addRow()" />
+                                    <p-button severity="danger" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedArticle || !selectedArticle.length" />
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template #body let-articles let-i="rowIndex">
+                            <tr>
+                                <td style="width: 3rem">
+                                     <p-tableCheckbox [value]="articles" />
+                                </td>
+                                <td style="min-width: 5rem">
+                                    {{articles.id}}
+                                    <!--                        <input type="text" pInputText id="name" [(ngModel)]="article.name"  />-->
+                                </td>
+                                <td style="min-width: 16rem">
+                                    <input type="text" pInputText id="name" [(ngModel)]="articles.name" [pAutoFocus]="true"  class="input-small" />
+                                </td>
+                                <td style="min-width: 16rem"> </td>
+                                <td></td>
+                                <td > </td>
+                                <td>
+
+                                </td>
+                                <td>
+<!--                                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"  />-->
+<!--                                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"  />-->
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template #footer>
+                            <tr>
+                                <td colspan="3" class="text-right font-bold p-3 pb-0">Totals</td>
+                                <td class="font-bold p-3 pb-0">25000</td>
+                                <td class="font-bold p-3 pb-0">3000</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+
+                </p-tabpanel>
+                <p-tabpanel value="1">
+                </p-tabpanel>
+
+            </p-tabpanels>
+
+        </p-tabs>
+
+<!--<div class="flex flex-col gap-2">-->
+<!--    <button pButton label="Créer" icon="pi pi-plus" class="p-button-success"></button>-->
+<!--    <button pButton label="Supprimer" icon="pi pi-trash" class="p-button-danger"></button>-->
+<!--</div>-->
+<!--</div>-->
+
+
+
+
+<!--</div>-->
+
+
+
+
+
