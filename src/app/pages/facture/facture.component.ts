@@ -21,11 +21,12 @@ import { TabsModule } from "primeng/tabs";
 import { ClientService } from '@/pages/service/clients.service';
 import { Client } from '@/models/client';
 import { FluidModule } from 'primeng/fluid';
-import { ArticleModel } from '@/pages/service/article.service';
+import { ArticleModel, ArticleModeleService } from '@/pages/service/article.service';
 import { FloatLabel } from 'primeng/floatlabel';
 import { DatePicker } from 'primeng/datepicker';
 import { AutoFocus } from 'primeng/autofocus';
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { Dialog } from 'primeng/dialog';
 
 interface Column {
     field: string;
@@ -65,7 +66,8 @@ interface ExportColumn {
         FloatLabel,
         DatePicker,
         AutoFocus,
-        AutoComplete
+        AutoComplete,
+        Dialog,
         // Checkbox
     ],
     templateUrl: './facture.component.html',
@@ -75,6 +77,8 @@ interface ExportColumn {
 })
 export class FactureComponent implements OnInit {
     articles = signal<ArticleModel[]>([]);
+
+    pDialog: boolean = false;
 
     client!: Client;
 
@@ -102,7 +106,13 @@ export class FactureComponent implements OnInit {
 
     filteredClients: any | undefined;
 
+    filteredArticles: any | undefined;
+
     selectedClients: any;
+
+    nameArticle: any;
+    cageot:any;
+    piece: any;
 
     dropdownItems = [
         { name: 'Gros', code: 'Option 1' },
@@ -114,6 +124,7 @@ export class FactureComponent implements OnInit {
 
     constructor(
         private clientService: ClientService,
+        private articleService: ArticleModeleService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService
     ) {}
@@ -127,6 +138,17 @@ export class FactureComponent implements OnInit {
         this.loadDemoData();
     }
 
+    openNewDialog() {
+        this.client = {};
+        this.submitted = false;
+        this.pDialog = true;
+    }
+
+    hideDialog() {
+        this.pDialog = false;
+        this.submitted = false;
+    }
+
     addRow() {
         this.listArticles.push({ id: this.tempIdCounter++, name: '' });
     }
@@ -136,6 +158,18 @@ export class FactureComponent implements OnInit {
         this.clientService.searchByName(query).subscribe({
             next: (data) => {
                 this.filteredClients = data;
+            },
+            error: (err) => {
+                console.error("Erreur lors de l'appel API :", err);
+            }
+        });
+    }
+
+    filterArticleByName(event: AutoCompleteCompleteEvent) {
+        let query = event.query;
+        this.articleService.filterByName(query).subscribe({
+            next: (data) => {
+                this.filteredArticles = data;
             },
             error: (err) => {
                 console.error("Erreur lors de l'appel API :", err);

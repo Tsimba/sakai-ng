@@ -22,18 +22,7 @@
                 <div class="card flex flex-col gap-4">
                     <div class="font-semibold text-xl">Client</div>
                     <div class="flex flex-col md:flex-row gap-4">
-<!--                        <p-floatlabel variant="on">-->
-<!--                            <input pInputText id="client" class="flex-1 w-full" />-->
-<!--                            <label for="client">Code</label>-->
-<!--                        </p-floatlabel>-->
-<!--                        <p-floatlabel variant="on">-->
                             <p-autocomplete  id="prenom" [(ngModel)]="selectedClients" class="flex-1 w-full" placeholder="Client" [suggestions]="filteredClients" (completeMethod)="searchByName($event)" optionLabel="lastname" />
-<!--                            <label for="prenom">Nom de Client</label>-->
-<!--                        </p-floatlabel>-->
-<!--                        <p-floatlabel variant="on" class="w-20rem">-->
-<!--                            <p-autocomplete  id="prenom" [(ngModel)]="selectedClients" class="flex-1 w-full" [suggestions]="filteredClients" (completeMethod)="searchByName($event)" optionLabel="lastname" />-->
-<!--                            <label for="prenom">Nom de Client</label>-->
-<!--                        </p-floatlabel>-->
                     </div>
 
                 </div>
@@ -105,7 +94,7 @@
                                 <!--                                <h3 class="text-lg font-semibold">Liste des clients</h3>-->
 
                                 <div class="flex gap-2">
-                                    <p-button label="Créer" icon="pi pi-plus" class="mr-2" (onClick)="addRow()" />
+                                    <p-button label="Créer" icon="pi pi-plus" class="mr-2" (onClick)="openNewDialog()" />
                                     <p-button severity="danger" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedArticle || !selectedArticle.length" />
                                 </div>
                             </div>
@@ -120,7 +109,8 @@
                                     <!--                        <input type="text" pInputText id="name" [(ngModel)]="article.name"  />-->
                                 </td>
                                 <td style="min-width: 16rem">
-                                    <input type="text" pInputText id="name" [(ngModel)]="articles.name" [pAutoFocus]="true"  class="input-small" />
+<!--                                    <input type="text" pInputText id="name" [(ngModel)]="articles.name" [pAutoFocus]="true"  class="input-small" />-->
+                                    <p-autocomplete  class="input-small" id="name" [(ngModel)]="articles.name" [pAutoFocus]="true" class="flex-1 w-full"  [suggestions]="filteredArticles" (completeMethod)="filterArticleByName($event)" optionLabel="name" />
                                 </td>
                                 <td style="min-width: 16rem"> </td>
                                 <td></td>
@@ -151,16 +141,41 @@
 
         </p-tabs>
 
-<!--<div class="flex flex-col gap-2">-->
-<!--    <button pButton label="Créer" icon="pi pi-plus" class="p-button-success"></button>-->
-<!--    <button pButton label="Supprimer" icon="pi pi-trash" class="p-button-danger"></button>-->
-<!--</div>-->
-<!--</div>-->
+    <p-dialog [(visible)]="pDialog" [style]="{width: '750px', height: '500px' }" header="Créer Client" [modal]="true" [resizable]="false">
+        <ng-template #content>
 
+            <div class="flex flex-col gap-6 my-fixed-tabs">
+                <div>
+                    <label for="nameArticle" class="block font-bold mb-3">Article</label>
+<!--                    <input type="text" pInputText id="firstName" [(ngModel)]="client.firstName" required autofocus fluid />-->
+                    <p-autocomplete id="nameArticle" [(ngModel)]="nameArticle" fluid  [pAutoFocus]="true"  [suggestions]="filteredArticles" required (completeMethod)="filterArticleByName($event)" optionLabel="name" />
+                </div>
+                <div>
+                    <span class="block font-bold mb-4">Conditionnement</span>
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="flex items-center gap-2 col-span-6">
+                            <p-radiobutton id="cageot" name="cageot" value="Cageots" [(ngModel)]="cageot" />
+                            <label for="cageot">Accessories</label>
+                        </div>
+                        <div class="flex items-center gap-2 col-span-6">
+                            <p-radiobutton id="num_piece" name="piece" value="Clothing" [(ngModel)]="piece" />
+                            <label for="piece">Pièce</label>
+                        </div>
+                    </div>
+                </div>
 
+            </div>
 
+        </ng-template>
 
-<!--</div>-->
+        <ng-template #footer>
+            <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+            <p-button label="Save" icon="pi pi-check" (click)="saveClient()" />
+        </ng-template>
+    </p-dialog>
+
+    <p-confirmdialog [style]="{ width: '450px' }" />
+
 
 
 

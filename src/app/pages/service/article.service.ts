@@ -91,6 +91,12 @@ export class ArticleModeleService {
          return this.http.get<PrixType[]>(this.url + "/v1/prixtype/getall");
     }
 
+    filterByName(name:any): Observable<any>{
+        const params = new HttpParams().set("nameFilter", name);
+        return this.http.get(this.url + "/v1/article/filter/name",{params});
+
+    }
+
     getArticlesData() {
         return [
             {
