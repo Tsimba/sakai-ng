@@ -3,7 +3,7 @@
         <div class="flex flex-col md:flex-row gap-8">
         <div class="md:w-1/2">
             <div class="card flex flex-col gap-4">
-                <div class="font-semibold text-xl">Facture</div>
+<!--                <div class="font-semibold text-xl">Facture</div>-->
                 <div class="flex flex-col md:flex-row gap-4">
                     <p-floatlabel variant="on">
                         <input pInputText id="numfact"  placeholder="N°"  [disabled]="true" class="flex-1 w-full" />
@@ -13,16 +13,18 @@
                         <p-datepicker [(ngModel)]="date"  id="on_date"   [disabled]="true"  class="flex-1 w-full" />
                         <label for="on_date">Date</label>
                     </p-floatlabel>
-                    <p-select id="typeprix" [(ngModel)]="dropdownItem" [options]="dropdownItems"  placeholder="Tarif"   optionLabel="name"  class="flex-1 w-full" ></p-select>
+                    <p-floatlabel variant="on">
+                        <p-select id="typeprix" [(ngModel)]="dropdownItem" [options]="dropdownItems" optionValue="value"  optionLabel="name"  class="flex-1 w-full" ></p-select>
+                        <label for="typeprix">Tarif</label>
+                    </p-floatlabel>
                 </div>
             </div>
         </div>
 
         <div class="md:w-1/2">
                 <div class="card flex flex-col gap-4">
-                    <div class="font-semibold text-xl">Client</div>
                     <div class="flex flex-col md:flex-row gap-4">
-                            <p-autocomplete  id="prenom" [(ngModel)]="selectedClients" class="flex-1 w-full" placeholder="Client" [suggestions]="filteredClients" (completeMethod)="searchByName($event)" optionLabel="lastname" />
+                       <p-autocomplete  id="prenom" [(ngModel)]="selectedClients" class="flex-1 w-full" placeholder="Client" [suggestions]="filteredClients" (completeMethod)="searchByName($event)" optionLabel="lastname" />
                     </div>
 
                 </div>
@@ -36,7 +38,7 @@
         <p-tabs value="0" >
             <p-tablist>
                 <p-tab value="0">Description</p-tab>
-                <p-tab value="1">Conditionnement</p-tab>
+                <p-tab value="1">Consignation</p-tab>
             </p-tablist>
             <p-tabpanels>
                 <p-tabpanel value="0">
@@ -53,6 +55,8 @@
                         [(selection)]="selectedArticle"
                         [rowHover]="true"
                         dataKey="id"
+                        (onEditInit)="onEditInit($event)"
+                        editMode="cell"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} articles"
                         [showCurrentPageReport]="true"
                         [rowsPerPageOptions]="[10, 20, 30]"
@@ -65,26 +69,30 @@
                                 </th>
                                 <th style="min-width: 5rem">ID</th>
                                 <th pSortableColumn="firstName" style="min-width:16rem">
-                                    Nom
+                                    Articles
                                     <p-sortIcon field="firstName" />
                                 </th>
                                 <!-- <th>Image</th> -->
-                                <th pSortableColumn="lastname" style="min-width: 8rem">
-                                    Prénom
-                                    <p-sortIcon field="lastname" />
+                                <th pSortableColumn="cageot" style="min-width: 8rem">
+                                    Cageot
+                                    <p-sortIcon field="Cageot" />
                                 </th>
-                                <th pSortableColumn="email" style="min-width:10rem">
-                                    Email
-                                    <p-sortIcon field="email" />
+                                <th pSortableColumn="piece" style="min-width:10rem">
+                                    Pièce
+                                    <p-sortIcon field="piece" />
                                 </th>
-                                <th pSortableColumn="phone" style="min-width:10rem">
-                                    Télephone
-                                    <p-sortIcon field="phone" />
+                                <th pSortableColumn="unitaire" style="min-width:10rem">
+                                    Prix Unitaire
+                                    <p-sortIcon field="unitaire" />
                                 </th>
 
-                                <th pSortableColumn="addresse" style="min-width: 12rem">
-                                    Adresse
-                                    <p-sortIcon field="addresse" />
+                                <th pSortableColumn="prixarticle" style="min-width: 12rem">
+                                    Prix Articles
+                                    <p-sortIcon field="prixarticle" />
+                                </th>
+                                <th pSortableColumn="prixbtl" style="min-width: 12rem">
+                                    Prix Btl
+                                    <p-sortIcon field="prixarticle" />
                                 </th>
                                 <th style="min-width: 12rem"></th>
                             </tr>
@@ -94,29 +102,85 @@
                                 <!--                                <h3 class="text-lg font-semibold">Liste des clients</h3>-->
 
                                 <div class="flex gap-2">
-                                    <p-button label="Créer" icon="pi pi-plus" class="mr-2" (onClick)="openNewDialog()" />
+                                    <p-floatlabel variant="on">
+                                        <p-autocomplete   id="nameArticle" [(ngModel)]="nameArticle" fluid  [pAutoFocus]="true"  [suggestions]="filteredArticles" required (completeMethod)="filterArticleByName($event)" optionLabel="name" />
+                                        <label for="nameArticle">Article</label>
+                                    </p-floatlabel>
+
+                                    <p-button label="Créer" icon="pi pi-plus" class="mr-2" (onClick)="AddFacture()" />
                                     <p-button severity="danger" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedArticle || !selectedArticle.length" />
+
+                                    <p-toast />
                                 </div>
+
                             </div>
                         </ng-template>
-                        <ng-template #body let-articles let-i="rowIndex">
+                        <ng-template #body let-article let-i="rowIndex">
                             <tr>
                                 <td style="width: 3rem">
-                                     <p-tableCheckbox [value]="articles" />
+                                     <p-tableCheckbox [value]="article" />
                                 </td>
                                 <td style="min-width: 5rem">
-                                    {{articles.id}}
+                                    {{i}}
                                     <!--                        <input type="text" pInputText id="name" [(ngModel)]="article.name"  />-->
                                 </td>
                                 <td style="min-width: 16rem">
-<!--                                    <input type="text" pInputText id="name" [(ngModel)]="articles.name" [pAutoFocus]="true"  class="input-small" />-->
-                                    <p-autocomplete  class="input-small" id="name" [(ngModel)]="articles.name" [pAutoFocus]="true" class="flex-1 w-full"  [suggestions]="filteredArticles" (completeMethod)="filterArticleByName($event)" optionLabel="name" />
+                                    {{article.name}}
                                 </td>
-                                <td style="min-width: 16rem"> </td>
-                                <td></td>
-                                <td > </td>
-                                <td>
 
+                                <td [pEditableColumn]="article.emballage.cageot" pEditableColumnField="cageot" style="min-width: 16rem">
+                                    <p-cellEditor >
+                                        <ng-template #input>
+                                            <p-inputnumber
+                                                #monChampInputNumber
+                                                focused
+                                                inputId="inputCgt"
+                                                [(ngModel)]="article.emballage.cageot"
+                                                (onInput)="onCalcul(article.emballage.cageot, article)"
+                                                fluid />
+
+
+                                        </ng-template>
+                                        <ng-template #output>
+                                            {{ article.emballage.cageot }}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td [pEditableColumn]="article.emballage.piece" pEditableColumnField="piece" style="min-width: 16rem">
+                                    <p-cellEditor>
+                                        <ng-template #input>
+<!--                                            <p-inputnumber-->
+<!--                                                [(ngModel)]="article.tempPiece"-->
+<!--                                                (blur)="onBlurCalculPiece(article)"-->
+<!--                                                (onInput)="onCalculePrixArticle(article)"-->
+<!--                                                fluid />-->
+
+                                            <input
+                                                pInputText
+                                                type="text"
+                                                [(ngModel)]="article.tempPiece"
+                                                (blur)="onBlurCalculPiece(article)"
+                                                (input)="onCalculePrixArticle(article)"
+                                                fluid />
+
+
+
+                                        </ng-template>
+                                        <ng-template #output>
+                                            {{ article.tempPiece }}
+                                        </ng-template>
+                                    </p-cellEditor>
+
+                                </td>
+                                <td >
+                                    {{ formatMontant(getPrix(article)) }}
+                                </td>
+                                <td>
+                                    {{formatMontant(article.prixArticle)}}
+
+                                </td>
+                                <td>
+                                    {{article.prixBtl}}
                                 </td>
                                 <td>
 <!--                                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"  />-->
@@ -141,40 +205,33 @@
 
         </p-tabs>
 
-    <p-dialog [(visible)]="pDialog" [style]="{width: '750px', height: '500px' }" header="Créer Client" [modal]="true" [resizable]="false">
+    <p-dialog [(visible)]="pDialog" [style]="{width: '550px', height: '500px' }"   header="Recherche articles" [modal]="true" [resizable]="false">
+
         <ng-template #content>
+                <div class="flex flex-col gap-6 my-fixed-tabs">
+                    <div>
+                        <label for="nameArticle" class="block font-bold mb-3">Article</label>
+                        <!--                    <input type="text" pInputText id="firstName" [(ngModel)]="client.firstName" required autofocus fluid />-->
+                        <p-autocomplete   id="nameArticle" [(ngModel)]="nameArticle" fluid  [pAutoFocus]="true"  [suggestions]="filteredArticles" required (completeMethod)="filterArticleByName($event)" optionLabel="name" />
 
-            <div class="flex flex-col gap-6 my-fixed-tabs">
-                <div>
-                    <label for="nameArticle" class="block font-bold mb-3">Article</label>
-<!--                    <input type="text" pInputText id="firstName" [(ngModel)]="client.firstName" required autofocus fluid />-->
-                    <p-autocomplete id="nameArticle" [(ngModel)]="nameArticle" fluid  [pAutoFocus]="true"  [suggestions]="filteredArticles" required (completeMethod)="filterArticleByName($event)" optionLabel="name" />
-                </div>
-                <div>
-                    <span class="block font-bold mb-4">Conditionnement</span>
-                    <div class="grid grid-cols-12 gap-4">
-                        <div class="flex items-center gap-2 col-span-6">
-                            <p-radiobutton id="cageot" name="cageot" value="Cageots" [(ngModel)]="cageot" />
-                            <label for="cageot">Accessories</label>
-                        </div>
-                        <div class="flex items-center gap-2 col-span-6">
-                            <p-radiobutton id="num_piece" name="piece" value="Clothing" [(ngModel)]="piece" />
-                            <label for="piece">Pièce</label>
-                        </div>
                     </div>
+<!--                    <div class="card flex justify-center">-->
+<!--                        <p-listbox [options]="conditionnement"  [(ngModel)]="cndtSelected"  optionLabel="name" class="w-full md:w-56" />-->
+<!--                    </div>-->
                 </div>
 
-            </div>
+
 
         </ng-template>
 
         <ng-template #footer>
             <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-            <p-button label="Save" icon="pi pi-check" (click)="saveClient()" />
+            <p-button label="Save" icon="pi pi-check" (click)="AddFacture()" />
         </ng-template>
+
     </p-dialog>
 
-    <p-confirmdialog [style]="{ width: '450px' }" />
+<!--    <p-confirmdialog [style]="{ width: '450px' }" />-->
 
 
 

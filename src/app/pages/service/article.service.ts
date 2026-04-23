@@ -7,6 +7,7 @@ import { Fournisseur } from '@/models/fournisseur';
 import { Conditionnement } from '@/models/conditionnement';
 import { Prix } from '@/models/prix';
 import { PrixType } from '@/models/prixtype';
+import { Emballages } from '@/models/emballages';
 
 interface InventoryStatus {
     label: string;
@@ -28,9 +29,12 @@ export class ArticleModel {
     typePrix?: any;
     cageot?: any;
     isActif?: boolean;
-    emballage?: string;
+    emballage?: Emballages;
     condition?: Conditionnement;
     prixList?: Prix[] ;
+    prixBtl?:number;
+    prixCgt?:number;
+
 }
 
 
@@ -91,10 +95,15 @@ export class ArticleModeleService {
          return this.http.get<PrixType[]>(this.url + "/v1/prixtype/getall");
     }
 
-    filterByName(name:any): Observable<any>{
-        const params = new HttpParams().set("nameFilter", name);
+    filterByName(name:any, category:any): Observable<any>{
+        const params = new HttpParams().set("nameFilter", name)
+                                                  .set("category", category);
         return this.http.get(this.url + "/v1/article/filter/name",{params});
 
+    }
+    findArticleById(artId:any){
+        const params = new HttpParams().set("id", artId);
+        return this.http.get(this.url + "/v1/article/getbyid",{params});
     }
 
     getArticlesData() {

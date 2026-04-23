@@ -1,7 +1,7 @@
 export class Conditionnement{
     id?: number;
     idArticle?: number;
-    articleBtl?: string | null;
-    articleCgt?: string | null;
+    articleBtl?: number;
+    articleCgt?: number;
     nbreBtl?: number;
 }

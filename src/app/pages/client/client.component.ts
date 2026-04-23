@@ -85,8 +85,6 @@ export class ClientComponent implements OnInit {
 
     type!: any[];
 
-    categories!: any[];
-
     @ViewChild('dt') dt!: Table;
 
     exportColumns!: ExportColumn[];
@@ -190,24 +188,6 @@ export class ClientComponent implements OnInit {
                 });
             }
         });
-    }
-
-    getSeverity(status: boolean) {
-        switch (status) {
-            case true:
-                return 'success';
-            default:
-                return 'warn';
-        }
-    }
-
-    getValueStatus(status: boolean) {
-        switch (status) {
-            case true:
-                return 'ACTIF';
-            default:
-                return 'INACTIF';
-        }
     }
 
     saveClient() {

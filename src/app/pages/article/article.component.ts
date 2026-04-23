@@ -115,6 +115,8 @@ export class ArticleComponent implements OnInit {
 
     conditionnement: Conditionnement = new Conditionnement();
 
+    dialogTitle = "Créer article";
+
     @ViewChild('dt') dt!: Table;
 
     // index: number = 0;
@@ -282,12 +284,22 @@ export class ArticleComponent implements OnInit {
         this.articleDialog = true;
     }
     openNewDialog() {
+        this.dialogTitle = "Créer article"
         this.article = {};
-        this.conditionnement.articleBtl = null;
-        this.conditionnement.articleCgt = null;
+        this.conditionnement = new Conditionnement();
+        this.conditionnement.articleBtl = 0;
+        this.conditionnement.articleCgt = 0;
         this.conditionnement.nbreBtl = 0;
+        for (let prix of this.listPrix) {
+            prix.valeur = 0;
+            prix.id = undefined;
+            // prix.article = new ArticleModel();
+        }
+
+        // this.getPrixTypeList();
         this.submitted = false;
         this.pDialog = true;
+        console.log('this.conditionnement====>', this.conditionnement);
     }
 
     onPrixChange(valeur: number, i: number) {
@@ -298,11 +310,13 @@ export class ArticleComponent implements OnInit {
     }
 
     editProduct(product: ArticleModel) {
-        this.conditionnement.articleBtl = null;
-        this.conditionnement.articleCgt = null;
+        this.dialogTitle = "Modifier article";
+        this.conditionnement.articleBtl = 0;
+        this.conditionnement.articleCgt = 0;
         this.conditionnement.nbreBtl = 0;
         this.article = { ...product };
         this.pDialog = true;
+        // this.getPrixTypeList();
         if(this.article.condition != undefined || this.article.condition != null){
             this.conditionnement = this.article.condition;
         }
@@ -392,23 +406,7 @@ export class ArticleComponent implements OnInit {
         });
     }
 
-    deleteProduct(article: ArticleModel) {
-        this.confirmationService.confirm({
-            message: 'Are you sure you want to delete ' + article.name + '?',
-            header: 'Confirm',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.articles.set(this.articles().filter((val) => val.id !== article.id));
-                this.article = {};
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Deleted',
-                    life: 3000
-                });
-            }
-        });
-    }
+
 
     findIndexById(id: string): number {
         let index = -1;
@@ -451,6 +449,7 @@ export class ArticleComponent implements OnInit {
 
     saveArticle(){
         this.submitted = true;
+        console.log('this.conditionnement===>', this.conditionnement);
         if(this.conditionnement !== null){
             this.article.condition = this.conditionnement;
         }
